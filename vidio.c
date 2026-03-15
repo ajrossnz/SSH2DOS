@@ -67,7 +67,7 @@
 /****************************************************************************/
 /* Global Data                                                              */
 
-unsigned short statusline = 1;  /* status line */
+unsigned short statusline = 0;  /* status line (disabled by default) */
 unsigned short vidmode = 0;	/* Screen video mode */
 unsigned short origvmode = 0;	/* Original video mode */
 unsigned columns;		/* Columns on logical terminal screen */
@@ -913,7 +913,7 @@ void ChrWrite(unsigned char chr)
 			chr = special_chars[chr - 95];
 	} else if(*GL == UK) {	/* If using the UK character set */
 		if(chr == '#')	/* then watch for the number sign */
-			chr = 'œ';	/* translating it to British pound */
+			chr = 'ï¿½';	/* translating it to British pound */
 	}
 
 	/* NOTE:  Inserting a character using this technique is *very* slow      */
@@ -1088,7 +1088,7 @@ void SetCharSet(int gset, unsigned char set)
 		break;
 	case 'A':		/* 'A' maps the character set to UK */
 		*charset = UK;	/* only difference between UK and ASCII */
-		break;		/* is the pound sign,  # = œ */
+		break;		/* is the pound sign,  # = ï¿½ */
 	case '0':		/* '0' maps the character set to SPECIAL */
 		*charset = SPECIAL;	/* this character set is the 'graphics' */
 		break;		/* character set used for line drawing */

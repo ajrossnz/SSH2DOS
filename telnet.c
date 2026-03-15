@@ -38,6 +38,7 @@
 #include "config.h"
 #include "telnet.h"
 #include "common.h"
+#include "unicode.h"
 
 /* external functions */
 SendFuncPtr SendPacket;
@@ -290,8 +291,9 @@ char *s;
 	    "-l <log file>                      - log session to file\n"
 	    "-b <COM[1234]>                     - Brailab PC adapter on COM[1234] port\n"
 	    "-P                                 - use non privileged local port\n"
-	    "-S                                 - disable status line\n"
-	    "-n                                 - add CR if server sends only LF";
+	    "-S                                 - enable status line\n"
+	    "-n                                 - add CR if server sends only LF\n"
+	    "-U                                 - disable UTF-8 to CP437 translation";
 
    for(i = 1; i < argc; ++i){
 	s = argv[i];
@@ -399,11 +401,15 @@ char *s;
 		continue;
 
 	   case 'S':
-		statusline = 0;
+		statusline = 1;
 		continue;
 
 	   case 'n':
 		Configuration |= NEWLINE;
+		continue;
+
+	   case 'U':
+		unicode_disable();
 		continue;
 
 	   default:
@@ -428,8 +434,10 @@ int main(int argc, char **argv)
 #else
    printf("TELNET v%s\n", SSH_VERSION);
 #endif
+   printf("%s\n", AUTHOR_4);
 
    Config_Init();	/* Initialize global variables */
+   unicode_init(); /* Enable UTF-8 to CP437 translation by default */
    getargs(argc, argv); /* Process command line */
 
    VESACheck();

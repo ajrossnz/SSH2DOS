@@ -52,8 +52,8 @@ lib/ssh.lib: negotiat.o transprt.o auth.o channel.o
 lib/vt100.lib: vttio.o vidio.o keyio.o keymap.o
 	wlib -b -c lib/vt100.lib -+vttio.o -+vidio.o -+keyio.o -+keymap.o
 
-lib/misc.lib: common.o shell.o proxy.o
-	wlib -b -c lib/misc.lib -+common.o -+shell.o -+proxy.o
+lib/misc.lib: common.o shell.o proxy.o unicode.o
+	wlib -b -c lib/misc.lib -+common.o -+shell.o -+proxy.o -+unicode.o
 
 clean: .SYMBOLIC
 	rm -f *.o

@@ -43,6 +43,7 @@
 #include "vttio.h"
 #include "keyio.h"
 #include "keymap.h"
+#include "unicode.h"
 #if defined (MEMWATCH)
  #include "memwatch.h"
 #endif
@@ -231,10 +232,11 @@ char *s;
 	    "-b <COM[1234]>                     - Brailab PC adapter on COM[1234] port\n"
 	    "-P                                 - don't allocate a privileged port\n"
 	    "-C                                 - enable compression\n"
-	    "-S                                 - disable status line\n"
+	    "-S                                 - enable status line\n"
             "-B                                 - use BIOS calls for video output\n"
             "-V                                 - disable VESA BIOS\n"
 	    "-n                                 - add CR if server sends only LF\n"
+	    "-U                                 - disable UTF-8 to CP437 translation\n"
 	    "-d                                 - save SSH packets to debug.pkt\n"
 	    "-v                                 - verbose output";
 
@@ -373,7 +375,7 @@ char *s;
 		continue;
 
 	   case 'S':
-		statusline = 0;
+		statusline = 1;
 		continue;
 
 	   case 'C':
@@ -390,6 +392,10 @@ char *s;
 
 	   case 'n':
 		Configuration += NEWLINE;
+		continue;
+
+	   case 'U':
+		unicode_disable();
 		continue;
 
 	   case 'd':
@@ -440,10 +446,12 @@ int main(int argc, char **argv)
 #endif
    printf("%s\n", AUTHOR_1);
    printf("%s\n", AUTHOR_2);
-   printf("%s\n\n", AUTHOR_3);
+   printf("%s\n", AUTHOR_3);
+   printf("%s\n\n", AUTHOR_4);
 
    Config_Init();	/* Initialize global variables */
    srand(time(NULL));	/* Initialize random number generator */
+   unicode_init(); /* Enable UTF-8 to CP437 translation by default */
 
    getargs(argc, argv); /* Process command line */
 

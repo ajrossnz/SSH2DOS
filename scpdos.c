@@ -900,7 +900,8 @@ int main(int argc, char **argv)
 #endif
    printf("%s\n", AUTHOR_1);
    printf("%s\n", AUTHOR_2);
-   printf("%s\n\n", AUTHOR_3);
+   printf("%s\n", AUTHOR_3);
+   printf("%s\n\n", AUTHOR_4);
 
    Config_Init();	/* Initialize global variables */
    srand(time(NULL));	/* Initialize random number generator */

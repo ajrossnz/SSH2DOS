@@ -1,0 +1,15 @@
+# Build artifacts
+*.o
+*.obj
+*.exe
+*.map
+*.err
+
+# Built libraries (pre-built wattcp/zlib libs are tracked separately)
+lib/crypto.lib
+lib/misc.lib
+lib/ssh.lib
+lib/vt100.lib
+
+# Archives
+ssh2dutf.zip

@@ -22,6 +22,7 @@
 #include "channel.h"
 #include "vidio.h"
 #include "keyio.h"
+#include "unicode.h"
 
 #define BLINK         0x80	/* Blink video attribute */
 #define NORMAL        0x7	/* Normal video attribute */
@@ -258,9 +259,57 @@ void VTInit(void)
 
 
 /*  C O N O U T  --  Put a character to the terminal screen */
+/*  If a Unicode mapping table is loaded, UTF-8 sequences are decoded */
+/*  and translated to CP437 before being passed to the VT100 parser.  */
+
+static unsigned char utf8_buf[4];
+static unsigned char utf8_len = 0;
+static unsigned char utf8_expected = 0;
 
 void ConOut(unsigned char c)
 {
+	/* If we are collecting a multi-byte UTF-8 sequence */
+	if (utf8_expected > 0) {
+		if ((c & 0xC0) == 0x80) {
+			/* Valid continuation byte */
+			utf8_buf[utf8_len++] = c;
+			utf8_expected--;
+			if (utf8_expected == 0) {
+				/* Complete sequence - decode and translate */
+				unicode_cp_t cp;
+				unsigned char display;
+				unicode_decode_utf8(utf8_buf, &cp);
+				if (cp > 0xFFFF) cp = 0xFFFD;
+				display = unicode_find_display_char((small_cp_t)cp);
+				(*ttstate)(display);
+				lastc = display;
+			}
+			return;
+		}
+		/* Invalid continuation - abandon sequence, fall through
+		 * to reprocess this byte normally */
+		utf8_expected = 0;
+		utf8_len = 0;
+	}
+
+	/* Check for start of a UTF-8 multi-byte sequence */
+	if ((c & 0xC0) == 0xC0 && unicode_xlate_loaded()) {
+		if ((c & 0xE0) == 0xC0)
+			utf8_expected = 1;      /* 2-byte sequence */
+		else if ((c & 0xF0) == 0xE0)
+			utf8_expected = 2;      /* 3-byte sequence */
+		else if ((c & 0xF8) == 0xF0)
+			utf8_expected = 3;      /* 4-byte sequence */
+		else {
+			utf8_expected = 0;
+			goto normal;
+		}
+		utf8_buf[0] = c;
+		utf8_len = 1;
+		return;
+	}
+
+normal:
 	(*ttstate) (c);
 	lastc = c;
 }
